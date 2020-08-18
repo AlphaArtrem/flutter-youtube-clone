@@ -22,17 +22,17 @@ class _ExploreTabState extends State<ExploreTab> {
   List<Map> _videos = [
     {
       'url': 'https://www.youtube.com/watch?v=Jakrc3Tn_y4',
-      'thumbnail': 'assets/img/layout_explorer.jpg',
-      'title': 'Layout Explorer',
+      'thumbnail': 'assets/img/gaming.jpeg',
+      'title': 'PS6 Leaks',
       'date': '16 hours ago',
       'views': '100k views',
-      'creator': 'Flutter',
-      'profile': 'assets/img/flutter.jpg',
+      'creator': 'Gamer Hub',
+      'profile': 'assets/img/gaming.jpeg',
     },
     {
       'url': 'https://www.youtube.com/watch?v=exgoaU3Fr5E',
-      'thumbnail': 'assets/img/witcher.jpg',
-      'title': 'Honest Trailers | The Witcher',
+      'thumbnail': 'assets/img/live.jpeg',
+      'title': 'Android Tricks',
       'date': '5 months ago',
       'views': '2M views',
       'creator': 'Screen Junkies',
@@ -40,34 +40,35 @@ class _ExploreTabState extends State<ExploreTab> {
     },
     {
       'url': 'https://www.youtube.com/watch?v=n_kpJj2War8',
-      'thumbnail': 'assets/img/cardano.jpg',
-      'title': 'Cardano | Atala Trace & Beefchain (2020)',
+      'thumbnail': 'assets/img/fashion.jpeg',
+      'title': 'Get Best Deals At Amazon',
       'date': '1 hour ago',
       'views': '30K views',
-      'creator': 'David Likes Crypto',
+      'creator': 'MarketingKing',
       'profile': 'assets/img/david.jpg',
     },
     {
       'url': 'https://www.youtube.com/watch?v=I7AJwGhNU5o',
-      'thumbnail': 'assets/img/keanu.jpg',
-      'title': 'Joe Rogan - We Should All Aspire to Be Like Keanu Reeves',
+      'thumbnail': 'assets/img/music.jpeg',
+      'title': 'Create Digital Music',
       'date': '1 year ago',
       'views': '1M views',
-      'creator': 'JRE Clips',
+      'creator': 'BeatWithMe',
       'profile': 'assets/img/joe.jpg',
     },
     {
       'url': 'https://www.youtube.com/watch?v=zDME7QO6_tM',
-      'thumbnail': 'assets/img/leap_of_faith.jpg',
-      'title': 'Spider-Verse | Leap of Faith',
+      'thumbnail': 'assets/img/news.jpeg',
+      'title': 'Manipulating the Collective Mind',
       'date': '9 months ago',
       'views': '800k views',
-      'creator': 'Sylfer2812',
+      'creator': 'JackTheRipper',
       'profile': 'assets/img/sylfer.jpg',
     },
   ];
 
   List<Widget> _categoriesWidgets = [];
+  List<Widget> _videosWidgets = [];
 
   @override
   Widget build(BuildContext context) {
@@ -176,61 +177,55 @@ class _ExploreTabState extends State<ExploreTab> {
       _categoriesWidgets.add(SizedBox(height: 5,));
     }
 
-    return Column(
+    for(int index = 0 ; index < _videos.length; index++){
+      _videosWidgets.add(Container(
+        child: Column(
+          children: <Widget>[
+            AspectRatio(
+              child: Image(
+                image: AssetImage(_videos[index]['thumbnail']),
+                centerSlice: Rect.largest,
+              ),
+              aspectRatio: 16 / 9,
+            ),
+            ListTile(
+              leading: CircleAvatar(
+                backgroundImage: AssetImage(_videos[index]['profile']),
+              ),
+              title: Text(
+                _videos[index]['title'],
+                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15.0),
+              ),
+              subtitle: Text(_videos[index]['creator']+ " \u22C5 " + _videos[index]['views'] + " \u22C5 "+ _videos[index]['date'], style: TextStyle(color: Colors.grey, fontSize: 12.0)),
+              trailing: Icon(Icons.more_vert),
+            ),
+          ],
+        ),
+      ));
+    }
+
+    return ListView(
       children: [
-        Padding(
+        Container(
+          height: _screenSize.height * 0.33,
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: _categoriesWidgets,
           ),
         ),
-        Expanded(
-          child: Container(
-            decoration: BoxDecoration(
+        Container(
+          decoration: BoxDecoration(
               color: Colors.white,
               border: Border(top: BorderSide(color: Colors.grey[400]))
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 20, top: 10),
-                  child: Text('Trending videos', style: TextStyle(fontSize: 15.0),),
-                ),
-                SizedBox(height: 10,),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: _videos.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return Container(
-                        child: Column(
-                          children: <Widget>[
-                            AspectRatio(
-                              child: Image(
-                                image: AssetImage(_videos[index]['thumbnail']),
-                                centerSlice: Rect.largest,
-                              ),
-                              aspectRatio: 16 / 9,
-                            ),
-                            ListTile(
-                              leading: CircleAvatar(
-                                backgroundImage: AssetImage(_videos[index]['profile']),
-                              ),
-                              title: Text(
-                                _videos[index]['title'],
-                                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15.0),
-                              ),
-                              subtitle: Text(_videos[index]['creator']+ " \u22C5 " + _videos[index]['views'] + " \u22C5 "+ _videos[index]['date'], style: TextStyle(color: Colors.grey, fontSize: 12.0)),
-                              trailing: Icon(Icons.more_vert),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
+          ),
+          padding: const EdgeInsets.only(left: 20, top: 10),
+          child: Text('Trending videos', style: TextStyle(fontSize: 15.0),),
+        ),
+        SizedBox(height: 10,),
+        Container(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: _videosWidgets
           ),
         )
       ],
