@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_ui/screens/explore.dart';
 import 'package:youtube_ui/screens/home.dart';
 
 class Wrapper extends StatefulWidget {
@@ -8,7 +9,7 @@ class Wrapper extends StatefulWidget {
 
 class _WrapperState extends State<Wrapper> {
   int _selectedIndex = 0;
-  static List<Widget> _widgetOptions = <Widget>[HomeTab(),Container(),Container(),Container(),Container(),];
+  static List<Widget> _widgetOptions = <Widget>[HomeTab(),ExploreTab(),Container(),Container(),Container(),];
 
   void _onItemTapped(int index) {
     setState(() {
