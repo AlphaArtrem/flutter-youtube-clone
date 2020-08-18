@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_ui/screens/home.dart';
 
 class Wrapper extends StatefulWidget {
   @override
@@ -7,7 +8,7 @@ class Wrapper extends StatefulWidget {
 
 class _WrapperState extends State<Wrapper> {
   int _selectedIndex = 0;
-  static List<Widget> _widgetOptions = <Widget>[Container(),Container(),Container(),Container(),Container(),];
+  static List<Widget> _widgetOptions = <Widget>[HomeTab(),Container(),Container(),Container(),Container(),];
 
   void _onItemTapped(int index) {
     setState(() {
@@ -17,9 +18,11 @@ class _WrapperState extends State<Wrapper> {
 
   @override
   Widget build(BuildContext context) {
+    Size size =  MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
-        title: Image.asset('assets/img/logo.png'),
+        elevation: 1.0,
+        title: Image.asset('assets/img/logo.png', height: size.width * 0.18,),
         actions: <Widget>[
           IconButton(
             onPressed: () {},
