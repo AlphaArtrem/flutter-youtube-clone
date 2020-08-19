@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:youtubeclone/helper/firestore.dart';
 import 'package:youtubeclone/helper/functions.dart';
@@ -16,6 +17,9 @@ class VideoPlayer extends StatefulWidget {
 }
 
 class _VideoPlayerState extends State<VideoPlayer> {
+  bool _liked = false;
+  bool _later = false;
+  SharedPreferences _sharedPreferences;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
   YoutubePlayerController _controller;
   TextEditingController _idController;
@@ -35,6 +39,34 @@ class _VideoPlayerState extends State<VideoPlayer> {
   YoutubeAPI _api = YoutubeAPI(key);
 
   void setup() async{
+    _sharedPreferences =  await SharedPreferences.getInstance();
+    if(_sharedPreferences.containsKey("history")){
+      List<String> recent = _sharedPreferences.getStringList("history");
+      if(!recent.contains(widget.videoDetails["id"])){
+        recent.add(widget.videoDetails["id"]);
+        await _sharedPreferences.setStringList("history", recent);
+      }
+    }
+    else{
+      List<String> recent = [];
+      recent.add(widget.videoDetails["id"]);
+      await _sharedPreferences.setStringList("history", recent);
+    }
+
+    if(_sharedPreferences.containsKey("likedVideos")){
+      List<String> liked = _sharedPreferences.getStringList("likedVideos");
+      if(liked.contains(widget.videoDetails["id"])){
+        _liked = true;
+      }
+    }
+
+    if(_sharedPreferences.containsKey("watchLater")){
+      List<String> liked = _sharedPreferences.getStringList("watchLater");
+      if(liked.contains(widget.videoDetails["id"])){
+        _later = true;
+      }
+    }
+
     try{
       _id = widget.videoDetails["id"];
     }catch(e){
@@ -190,11 +222,30 @@ class _VideoPlayerState extends State<VideoPlayer> {
                   children: [
                     Expanded(
                       child: IconButton(
-                        icon: Icon(Icons.thumb_up),
+                        icon: Icon(Icons.thumb_up, color: _liked ? Colors.red : Colors.black,),
                         onPressed: () async{
-                          UserDataBase uDB = UserDataBase();
-                          dynamic result = uDB.addLikeVideo(widget.videoDetails);
-                          print(result);
+                          if(_sharedPreferences.containsKey("likedVideos")){
+                            List<String> liked = _sharedPreferences.getStringList("likedVideos");
+                            if( liked.contains(widget.videoDetails["id"])){
+                              liked.remove(widget.videoDetails["id"]);
+                              setState(() {
+                                _liked = false;
+                              });
+                            }
+                            else{
+                              liked.add(widget.videoDetails["id"]);
+                              setState(() {
+                                _liked = true;
+                              });
+                            }
+                            await _sharedPreferences.setStringList("likedVideos", liked);
+                          }
+                          else{
+                            await _sharedPreferences.setStringList("likedVideos", <String>[widget.videoDetails["id"]]);
+                            setState(() {
+                              _liked = true;
+                            });
+                          }
                         },
                       ),
                     ),
@@ -211,8 +262,31 @@ class _VideoPlayerState extends State<VideoPlayer> {
                     ),
                     Expanded(
                       child: IconButton(
-                        icon: Icon(Icons.add),
-                        onPressed: (){},
+                        icon: Icon(Icons.watch_later, color:  _later ? Colors.red : Colors.black,),
+                        onPressed: () async{
+                          if(_sharedPreferences.containsKey("watchLater")){
+                            List<String> liked = _sharedPreferences.getStringList("watchLater");
+                            if( liked.contains(widget.videoDetails["id"])){
+                              liked.remove(widget.videoDetails["id"]);
+                              setState(() {
+                                _later = false;
+                              });
+                            }
+                            else{
+                              liked.add(widget.videoDetails["id"]);
+                              setState(() {
+                                _later = true;
+                              });
+                            }
+                            await _sharedPreferences.setStringList("watchLater", liked);
+                          }
+                          else{
+                            await _sharedPreferences.setStringList("watchLater", <String>[widget.videoDetails["id"]]);
+                            setState(() {
+                              _later = true;
+                            });
+                          }
+                        },
                       ),
                     ),
                   ],

@@ -14,7 +14,6 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   TextEditingController _controller = TextEditingController();
   List _videos = [];
-  List<Widget> _videosWidgets = [];
   Map _channelDetails = {};
 
   static String key = 'AIzaSyAqMLu_Grl4Q6AMxT_ieSDF_Ul6jkchk6c';
@@ -75,7 +74,7 @@ class _SearchPageState extends State<SearchPage> {
           itemCount: _videos.length,
           itemBuilder: (context, index){
             String publishedAt = uploadDuration(_videos[index]["snippet"]["publishedAt"]);
-            String thumbnail  = _videos[index]["snippet"]["thumbnails"]["high"]["url"];
+            String thumbnail  = _videos[index]["snippet"]["thumbnails"]["standard"]["url"];
             return Container(
               padding: EdgeInsets.only(right: 15, bottom: 10),
               child: Row(

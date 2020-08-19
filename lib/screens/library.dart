@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:youtubeclone/helper/loading.dart';
+import 'package:youtubeclone/helper/youtubeAPI.dart';
+import 'package:youtubeclone/screens/videoPlayer.dart';
 
 class LibraryTab extends StatefulWidget {
   @override
@@ -6,98 +10,47 @@ class LibraryTab extends StatefulWidget {
 }
 
 class _LibraryTabState extends State<LibraryTab> {
-  List<Map> _history = [
-    {
-      'url': 'https://www.youtube.com/watch?v=Jakrc3Tn_y4',
-      'thumbnail': 'assets/img/layout_explorer.jpg',
-      'title': 'Layout Explorer',
-      'date': '16 hours ago',
-      'views': '100k views',
-      'creator': 'Flutter',
-      'profile': 'assets/img/flutter.jpg',
-    },
-    {
-      'url': 'https://www.youtube.com/watch?v=exgoaU3Fr5E',
-      'thumbnail': 'assets/img/witcher.jpg',
-      'title': 'Honest Trailers | The Witcher',
-      'date': '5 months ago',
-      'views': '2M views',
-      'creator': 'Screen Junkies',
-      'profile': 'assets/img/screen.jpg',
-    },
-    {
-      'url': 'https://www.youtube.com/watch?v=n_kpJj2War8',
-      'thumbnail': 'assets/img/cardano.jpg',
-      'title': 'Cardano | Atala Trace & Beefchain (2020)',
-      'date': '1 hour ago',
-      'views': '30K views',
-      'creator': 'David Likes Crypto',
-      'profile': 'assets/img/david.jpg',
-    },
-    {
-      'url': 'https://www.youtube.com/watch?v=I7AJwGhNU5o',
-      'thumbnail': 'assets/img/keanu.jpg',
-      'title': 'Joe Rogan - We Should All Aspire to Be Like Keanu Reeves',
-      'date': '1 year ago',
-      'views': '1M views',
-      'creator': 'JRE Clips',
-      'profile': 'assets/img/joe.jpg',
-    },
-    {
-      'url': 'https://www.youtube.com/watch?v=zDME7QO6_tM',
-      'thumbnail': 'assets/img/leap_of_faith.jpg',
-      'title': 'Spider-Verse | Leap of Faith',
-      'date': '9 months ago',
-      'views': '800k views',
-      'creator': 'Sylfer2812',
-      'profile': 'assets/img/sylfer.jpg',
-    },
-    {
-      'url': 'https://www.youtube.com/watch?v=Jakrc3Tn_y4',
-      'thumbnail': 'assets/img/gaming.jpeg',
-      'title': 'PS6 Leaks',
-      'date': '16 hours ago',
-      'views': '100k views',
-      'creator': 'Gamer Hub',
-      'profile': 'assets/img/gaming.jpeg',
-    },
-    {
-      'url': 'https://www.youtube.com/watch?v=exgoaU3Fr5E',
-      'thumbnail': 'assets/img/live.jpeg',
-      'title': 'Android Tricks',
-      'date': '5 months ago',
-      'views': '2M views',
-      'creator': 'Screen Junkies',
-      'profile': 'assets/img/screen.jpg',
-    },
-    {
-      'url': 'https://www.youtube.com/watch?v=n_kpJj2War8',
-      'thumbnail': 'assets/img/fashion.jpeg',
-      'title': 'Get Best Deals At Amazon',
-      'date': '1 hour ago',
-      'views': '30K views',
-      'creator': 'MarketingKing',
-      'profile': 'assets/img/david.jpg',
-    },
-    {
-      'url': 'https://www.youtube.com/watch?v=I7AJwGhNU5o',
-      'thumbnail': 'assets/img/music.jpeg',
-      'title': 'Create Digital Music',
-      'date': '1 year ago',
-      'views': '1M views',
-      'creator': 'BeatWithMe',
-      'profile': 'assets/img/joe.jpg',
-    },
-    {
-      'url': 'https://www.youtube.com/watch?v=zDME7QO6_tM',
-      'thumbnail': 'assets/img/news.jpeg',
-      'title': 'Manipulating the Collective Mind',
-      'date': '9 months ago',
-      'views': '800k views',
-      'creator': 'JackTheRipper',
-      'profile': 'assets/img/sylfer.jpg',
-    },
-  ];
+  List _recent = [];
+  SharedPreferences _sharedPreferences;
+  static String key = 'AIzaSyAqMLu_Grl4Q6AMxT_ieSDF_Ul6jkchk6c';
+  bool _loading = true;
+  Map _channelDetails = {};
+
+  YoutubeAPI _api = YoutubeAPI(key);
+
+  void setup() async{
+    _sharedPreferences = await SharedPreferences.getInstance();
+    List<String> ids = [];
+    if(_sharedPreferences.containsKey("history")){
+      List _history = _sharedPreferences.getStringList("history");
+      if(_history.length > 10){
+        _recent = await _api.getVideos(_history.sublist(_history.length - 11, _history.length -1));
+      }
+      else{
+        _recent = await _api.getVideos(_history);
+      }
+
+      for(int i = 0; i < _recent.length; i++){
+        ids.add(_recent[i]["snippet"]["channelId"]);
+      }
+
+      List channels = await _api.getChannelDetails(ids);
+
+      for(Map channel in channels) {
+        _channelDetails[channel['id']] = channel;
+      }
+    }
+    setState(() {
+      _loading = false;
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    setup();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -115,9 +68,9 @@ class _LibraryTabState extends State<LibraryTab> {
               border: Border(bottom: BorderSide(color: Colors.grey[300]))
             ),
             height: size.height * 0.2,
-            child: ListView.builder(
+            child: _loading ? Center(child: spinkit) : _recent.isEmpty ? Center(child: Text("No history found"),) : ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: _history.length,
+              itemCount: _recent.length,
               itemBuilder: (context, index){
                 return Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -126,11 +79,28 @@ class _LibraryTabState extends State<LibraryTab> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Image.asset(_history[index]['thumbnail'], height: size.height * 0.12,),
+                        GestureDetector(
+                          child:  AspectRatio(
+                            child: Image(
+                              image: NetworkImage(_recent[index]["snippet"]["thumbnails"]["standard"]["url"]),
+                              fit: BoxFit.cover,
+                            ),
+                            aspectRatio: 16 / 9,
+                          ),
+                          onTap: () async{
+                              Map videoDetails = _recent[index];
+
+                              videoDetails["channelImage"] = _channelDetails[_recent[index]["snippet"]['channelId']]["snippet"]["thumbnails"]["default"]["url"];
+                              videoDetails["subscriberCount"] = _channelDetails[_recent[index]["snippet"]['channelId']]["statistics"]["subscriberCount"];
+                              await Navigator.push(context, MaterialPageRoute(
+                              builder : (context) => VideoPlayer(videoDetails)
+                              ));
+                           },
+                        ),
                         SizedBox(height: 8.0,),
-                        Text(_history[index]['title'], style: TextStyle(fontSize: 14.0), overflow: TextOverflow.ellipsis,),
+                        Text(_recent[index]["snippet"]['title'], style: TextStyle(fontSize: 14.0), overflow: TextOverflow.ellipsis,),
                         SizedBox(height: 2.0,),
-                        Text(_history[index]['creator'], style: TextStyle(color: Colors.grey, fontSize: 12.0)),
+                        Text(_recent[index]["snippet"]['channelTitle'], style: TextStyle(color: Colors.grey, fontSize: 12.0)),
                       ],
                     ),
                   ),

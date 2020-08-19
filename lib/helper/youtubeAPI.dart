@@ -84,4 +84,25 @@ class YoutubeAPI{
 
     return jsonData['items'];
   }
+
+  Future<List> getVideos(List<String> videos) async {
+    Map<String, dynamic> options = {
+      "part": [
+        "snippet,contentDetails,statistics"
+      ],
+      "id": videos,
+      "key": "${this.key}",
+    };
+
+    Uri uri = Uri(scheme: 'https',
+        host: "www.googleapis.com",
+        path: "youtube/v3/videos",
+        queryParameters: options);
+
+
+    var res = await http.get(uri, headers: {"Accept": "application/json"});
+    Map jsonData = json.decode(res.body);
+
+    return jsonData['items'];
+  }
 }
