@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:youtube_ui/wrapper.dart';
+import 'package:youtubeclone/wrapper.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();

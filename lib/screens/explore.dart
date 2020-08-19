@@ -2,10 +2,11 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:youtube_ui/helper/functions.dart';
-import 'package:youtube_ui/helper/loading.dart';
-import 'package:youtube_ui/helper/youtubeAPI.dart';
-import 'package:youtube_ui/screens/videoPlayer.dart';
+import 'package:youtubeclone/helper/functions.dart';
+import 'package:youtubeclone/helper/loading.dart';
+import 'package:youtubeclone/screens/search.dart';
+import 'package:youtubeclone/screens/videoPlayer.dart';
+import 'package:youtubeclone/helper/youtubeAPI.dart';
 
 class ExploreTab extends StatefulWidget {
   @override
@@ -82,41 +83,48 @@ class _ExploreTabState extends State<ExploreTab> {
               ),
               semanticContainer: true,
               clipBehavior: Clip.antiAliasWithSaveLayer,
-              child: Stack(
-                children: <Widget>[
-                  Image.asset(
-                    'assets/img/${categories[i].toString().toLowerCase()}.jpeg',
-                    fit: BoxFit.cover,
-                    height: _screenSize.height * 0.06,
-                    width: _screenSize.width * 0.6,
-                  ),
-                  Container(
-                    height: _screenSize.height * 0.06,
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 1, sigmaY: 1),
-                      child: Container(
-                        color: Colors.black.withOpacity(0),
+              child: GestureDetector(
+                onTap: () async{
+                  await Navigator.push(context, MaterialPageRoute(
+                      builder: (context) => SearchPage(categories[i].toString().toLowerCase())
+                  ));
+                },
+                child: Stack(
+                  children: <Widget>[
+                    Image.asset(
+                      'assets/img/${categories[i].toString().toLowerCase()}.jpeg',
+                      fit: BoxFit.cover,
+                      height: _screenSize.height * 0.06,
+                      width: _screenSize.width * 0.6,
+                    ),
+                    Container(
+                      height: _screenSize.height * 0.06,
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 1, sigmaY: 1),
+                        child: Container(
+                          color: Colors.black.withOpacity(0),
+                        ),
                       ),
                     ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.only(top: _screenSize.height * 0.015),
-                    child: Row(
-                      children: [
-                        SizedBox(width: 20,),
-                        _categories[categories[i]],
-                        SizedBox(width : 10),
-                        Text(
-                          categories[i],
-                          style: TextStyle(
-                            color: Colors.white, fontSize: 15,
-                            fontWeight: FontWeight.w600,
+                    Container(
+                      margin: EdgeInsets.only(top: _screenSize.height * 0.015),
+                      child: Row(
+                        children: [
+                          SizedBox(width: 20,),
+                          _categories[categories[i]],
+                          SizedBox(width : 10),
+                          Text(
+                            categories[i],
+                            style: TextStyle(
+                              color: Colors.white, fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  )
-                ],
+                        ],
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
           ),
@@ -129,41 +137,48 @@ class _ExploreTabState extends State<ExploreTab> {
               ),
               semanticContainer: true,
               clipBehavior: Clip.antiAliasWithSaveLayer,
-              child: Stack(
-                children: <Widget>[
-                  Image.asset(
-                    'assets/img/${categories[i + 1].toString().toLowerCase()}.jpeg',
-                    fit: BoxFit.fill,
-                    height: _screenSize.height * 0.06,
-                    width: _screenSize.width * 0.6,
-                  ),
-                  Container(
-                    height: _screenSize.height * 0.06,
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 1, sigmaY: 1),
-                      child: Container(
-                        color: Colors.black.withOpacity(0),
+              child: GestureDetector(
+                onTap: () async{
+                  await Navigator.push(context, MaterialPageRoute(
+                      builder: (context) => SearchPage(categories[i + 1].toString().toLowerCase())
+                  ));
+                },
+                child: Stack(
+                  children: <Widget>[
+                    Image.asset(
+                      'assets/img/${categories[i + 1].toString().toLowerCase()}.jpeg',
+                      fit: BoxFit.fill,
+                      height: _screenSize.height * 0.06,
+                      width: _screenSize.width * 0.6,
+                    ),
+                    Container(
+                      height: _screenSize.height * 0.06,
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 1, sigmaY: 1),
+                        child: Container(
+                          color: Colors.black.withOpacity(0),
+                        ),
                       ),
                     ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.only(top: _screenSize.height * 0.015),
-                    child: Row(
-                      children: [
-                        SizedBox(width: 20,),
-                        _categories[categories[i + 1]],
-                        SizedBox(width : 10),
-                        Text(
-                          categories[i + 1],
-                          style: TextStyle(
-                            color: Colors.white, fontSize: 15,
-                            fontWeight: FontWeight.w600,
+                    Container(
+                      margin: EdgeInsets.only(top: _screenSize.height * 0.015),
+                      child: Row(
+                        children: [
+                          SizedBox(width: 20,),
+                          _categories[categories[i + 1]],
+                          SizedBox(width : 10),
+                          Text(
+                            categories[i + 1],
+                            style: TextStyle(
+                              color: Colors.white, fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  )
-                ],
+                        ],
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
           ),

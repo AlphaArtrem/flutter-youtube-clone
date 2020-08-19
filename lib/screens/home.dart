@@ -2,10 +2,10 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:youtube_ui/helper/functions.dart';
-import 'package:youtube_ui/helper/loading.dart';
-import 'package:youtube_ui/helper/youtubeAPI.dart';
-import 'package:youtube_ui/screens/videoPlayer.dart';
+import 'package:youtubeclone/helper/functions.dart';
+import 'package:youtubeclone/helper/loading.dart';
+import 'package:youtubeclone/helper/youtubeAPI.dart';
+import 'package:youtubeclone/screens/videoPlayer.dart';
 
 class HomeTab extends StatefulWidget {
   @override

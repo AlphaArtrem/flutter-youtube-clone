@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:youtube_ui/helper/accounts.dart';
-import 'package:youtube_ui/screens/explore.dart';
-import 'package:youtube_ui/screens/home.dart';
-import 'package:youtube_ui/screens/library.dart';
-import 'package:youtube_ui/screens/notifications.dart';
-import 'package:youtube_ui/screens/stories.dart';
-import 'package:youtube_ui/screens/subscription.dart';
+import 'package:youtubeclone/helper/accounts.dart';
+import 'package:youtubeclone/screens/explore.dart';
+import 'package:youtubeclone/screens/home.dart';
+import 'package:youtubeclone/screens/library.dart';
+import 'package:youtubeclone/screens/notifications.dart';
+import 'package:youtubeclone/screens/profile.dart';
+import 'package:youtubeclone/screens/search.dart';
+import 'package:youtubeclone/screens/stories.dart';
+import 'package:youtubeclone/screens/subscription.dart';
+
 
 class Wrapper extends StatefulWidget {
   @override
@@ -17,6 +20,8 @@ class _WrapperState extends State<Wrapper> {
   int _selectedIndex = 0;
   static List<Widget> _widgetOptions = <Widget>[HomeTab(),ExploreTab(),SubscriptionTab(), NotificationsTab(), LibraryTab(),];
   Account _user = Account();
+  bool _search = false;
+  TextEditingController _controller = TextEditingController();
 
   void _onItemTapped(int index) {
     setState(() {
@@ -30,8 +35,26 @@ class _WrapperState extends State<Wrapper> {
     return Scaffold(
       appBar: AppBar(
         elevation: 1.0,
-        title: Image.asset('assets/img/logo.png', height: size.width * 0.18,),
-        actions: <Widget>[
+        title:  _search ? TextField(
+          controller: _controller,
+          textInputAction: TextInputAction.search,
+          decoration: InputDecoration(
+            border: OutlineInputBorder(
+              borderSide: BorderSide.none
+            ),
+            prefixIcon: Icon(Icons.search, color: Colors.grey[400],),
+            hintText: "Search..."
+          ),
+          onSubmitted: (value) async{
+            await Navigator.push(context, MaterialPageRoute(
+              builder: (context) => SearchPage(value)
+            ));
+            setState(() {
+              _search = false;
+            });
+          },
+        ) : Image.asset('assets/img/logo.png', height: size.width * 0.18,),
+        actions: _search? [] : <Widget>[
           IconButton(
             onPressed: () async{
               SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]);
@@ -49,21 +72,32 @@ class _WrapperState extends State<Wrapper> {
             onPressed: () {},
             icon: Icon(Icons.videocam),
           ),
-          IconButton(
-            onPressed: () {},
+         IconButton(
+            onPressed: () {
+              setState(() {
+                _search = true;
+              });
+            },
             icon: Icon(Icons.search),
           ),
           _user.currentUser() == null ?IconButton(
             onPressed: () async{
               await _user.signInWithGoogle();
-              setState(() {});
             },
             icon: Icon(Icons.person),
-          ) : CircleAvatar(
-            child: ClipOval(
-              child: Image.network(_user.currentUser().photoUrl),
+          ) : GestureDetector(
+            onTap: () async {
+              await Navigator.push(context, MaterialPageRoute(
+                builder: (context) => ProfilePage()
+              ));
+              setState(() {});
+            },
+            child: CircleAvatar(
+              child: ClipOval(
+                child: Image.network(_user.currentUser().photoUrl),
+              ),
+              radius: size.width * 0.055,
             ),
-            radius: size.width * 0.055,
           ),
           SizedBox(width: 5,),
         ],

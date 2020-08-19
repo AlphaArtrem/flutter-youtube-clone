@@ -16,11 +16,9 @@ class YoutubeAPI{
 
     Uri uri = Uri(scheme:'https', host: "www.googleapis.com", path: "youtube/v3/videos", queryParameters: options);
 
-    //Uri url = Uri.https("www.googleapis.com", "youtube/v3/videos", options);
     var res = await http.get(uri, headers: {"Accept": "application/json"});
     Map jsonData = json.decode(res.body);
 
-    //print(jsonData["items"][0].keys);
     return jsonData['items'];
   }
 
@@ -36,11 +34,8 @@ class YoutubeAPI{
         path: "youtube/v3/channels",
         queryParameters: options);
 
-    //Uri url = Uri.https("www.googleapis.com", "youtube/v3/videos", options);
     var res = await http.get(uri, headers: {"Accept": "application/json"});
     Map jsonData = json.decode(res.body);
-
-    //print(jsonData["items"][0].keys);
     return jsonData['items'];
   }
 
@@ -61,11 +56,32 @@ class YoutubeAPI{
         path: "youtube/v3/search",
         queryParameters: options);
 
-    //Uri url = Uri.https("www.googleapis.com", "youtube/v3/videos", options);
+
     var res = await http.get(uri, headers: {"Accept": "application/json"});
     Map jsonData = json.decode(res.body);
 
-    print(jsonData);
+    return jsonData['items'];
+  }
+
+  Future<List> searchVideos(String search) async {
+    Map<String, dynamic> options = {
+      "part": [
+        "snippet"
+      ],
+      "maxResults": "25",
+      "q": search,
+      "key": "${this.key}",
+    };
+
+    Uri uri = Uri(scheme: 'https',
+        host: "www.googleapis.com",
+        path: "youtube/v3/search",
+        queryParameters: options);
+
+
+    var res = await http.get(uri, headers: {"Accept": "application/json"});
+    Map jsonData = json.decode(res.body);
+
     return jsonData['items'];
   }
 }

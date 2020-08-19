@@ -1,9 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
-import 'package:youtube_ui/helper/functions.dart';
-import 'package:youtube_ui/helper/loading.dart';
-import 'package:youtube_ui/helper/youtubeAPI.dart';
+import 'package:youtubeclone/helper/firestore.dart';
+import 'package:youtubeclone/helper/functions.dart';
+import 'package:youtubeclone/helper/loading.dart';
+import 'package:youtubeclone/helper/youtubeAPI.dart';
+import 'package:share/share.dart';
+
 
 class VideoPlayer extends StatefulWidget {
   final Map videoDetails;
@@ -26,19 +29,19 @@ class _VideoPlayerState extends State<VideoPlayer> {
   List _videos = [];
   List<Widget> _videosWidgets = [];
   Map _channelDetails = {};
+  String _id;
 
   static String key = 'AIzaSyAqMLu_Grl4Q6AMxT_ieSDF_Ul6jkchk6c';
   YoutubeAPI _api = YoutubeAPI(key);
 
   void setup() async{
-    String id;
     try{
-      id = widget.videoDetails["id"];
+      _id = widget.videoDetails["id"];
     }catch(e){
-      id = widget.videoDetails["id"]["videoId"];
+      _id = widget.videoDetails["id"]["videoId"];
     }
     _controller = YoutubePlayerController(
-      initialVideoId: id,
+      initialVideoId: _id,
       flags: const YoutubePlayerFlags(
         mute: false,
         autoPlay: true,
@@ -53,7 +56,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
     _seekToController = TextEditingController();
     _videoMetaData = const YoutubeMetaData();
     _playerState = PlayerState.unknown;
-    _videos = await _api.getRelatedVideos(id);
+    _videos = await _api.getRelatedVideos(_id);
 
     List<String> ids = [];
 
@@ -182,6 +185,37 @@ class _VideoPlayerState extends State<VideoPlayer> {
                 Padding(
                   padding: const EdgeInsets.only(left: 8.0, top: 5.0),
                   child: Text(viewCount + publishedAt, style: TextStyle(color: Colors.grey, fontSize: 12.0)),
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: IconButton(
+                        icon: Icon(Icons.thumb_up),
+                        onPressed: () async{
+                          UserDataBase uDB = UserDataBase();
+                          dynamic result = uDB.addLikeVideo(widget.videoDetails);
+                          print(result);
+                        },
+                      ),
+                    ),
+                    Expanded(
+                      child: IconButton(
+                        icon: Icon(Icons.share),
+                        onPressed: (){
+                          Share.share(
+                              "https://www.youtube.com/watch?v=" + _id + "\n" + widget.videoDetails["snippet"]['title'] + "\n" + widget.videoDetails["snippet"]['description'] ,
+                              subject: widget.videoDetails["snippet"]['title']
+                          );
+                        },
+                      ),
+                    ),
+                    Expanded(
+                      child: IconButton(
+                        icon: Icon(Icons.add),
+                        onPressed: (){},
+                      ),
+                    ),
+                  ],
                 ),
                 Container(
                   margin: EdgeInsets.only(top: 15.0),

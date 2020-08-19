@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:youtube_ui/screens/home.dart';
+import 'package:youtubeclone/screens/home.dart';
 
 class SubscriptionTab extends StatefulWidget {
   @override
