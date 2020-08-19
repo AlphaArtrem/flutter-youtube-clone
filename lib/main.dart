@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:youtube_ui/wrapper.dart';
 
 void main() {
@@ -13,6 +14,9 @@ class YoutubeUIClone extends StatefulWidget {
 class _YoutubeUICloneState extends State<YoutubeUIClone> {
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+    ));
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       darkTheme: ThemeData.dark(),

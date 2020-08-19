@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:youtube_ui/screens/explore.dart';
 import 'package:youtube_ui/screens/home.dart';
+import 'package:youtube_ui/screens/library.dart';
+import 'package:youtube_ui/screens/notifications.dart';
+import 'package:youtube_ui/screens/stories.dart';
 import 'package:youtube_ui/screens/subscription.dart';
 
 class Wrapper extends StatefulWidget {
@@ -10,7 +14,7 @@ class Wrapper extends StatefulWidget {
 
 class _WrapperState extends State<Wrapper> {
   int _selectedIndex = 0;
-  static List<Widget> _widgetOptions = <Widget>[HomeTab(),ExploreTab(),SubscriptionTab(),Container(),Container(),];
+  static List<Widget> _widgetOptions = <Widget>[HomeTab(),ExploreTab(),SubscriptionTab(), NotificationsTab(), LibraryTab(),];
 
   void _onItemTapped(int index) {
     setState(() {
@@ -26,6 +30,19 @@ class _WrapperState extends State<Wrapper> {
         elevation: 1.0,
         title: Image.asset('assets/img/logo.png', height: size.width * 0.18,),
         actions: <Widget>[
+          IconButton(
+            onPressed: () async{
+              SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]);
+              await Navigator.push(context, MaterialPageRoute(
+                builder: (context) => Stories(MediaQuery.of(context).size),
+              ));
+              SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
+              SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+                statusBarColor: Colors.transparent,
+              ));
+            },
+            icon: Icon(Icons.ondemand_video),
+          ),
           IconButton(
             onPressed: () {},
             icon: Icon(Icons.videocam),
