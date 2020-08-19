@@ -1,34 +1,42 @@
 {
   "project_info": {
-    "project_number": "74983151136",
-    "firebase_url": "https://clone-be1e6.firebaseio.com",
-    "project_id": "clone-be1e6",
-    "storage_bucket": "clone-be1e6.appspot.com"
+    "project_number": "294320042897",
+    "firebase_url": "https://clone-13bf1.firebaseio.com",
+    "project_id": "clone-13bf1",
+    "storage_bucket": "clone-13bf1.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:74983151136:android:c6036eaafd36bf41dc8e45",
+        "mobilesdk_app_id": "1:294320042897:android:afce6fbf9f26604e5c2030",
         "android_client_info": {
-          "package_name": "com.alphaartrem.youtube_ui"
+          "package_name": "com.alphaartrem.youtubeclone"
         }
       },
       "oauth_client": [
         {
-          "client_id": "74983151136-43c6lukhqc87uatao7f1q6k7ogrq8kvj.apps.googleusercontent.com",
+          "client_id": "294320042897-2dl9jgg0n8kcn80a6pe2ihlherad3h92.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.alphaartrem.youtubeclone",
+            "certificate_hash": "adc8c09dcfb58960eda7924affde6ddbd8aff6f6"
+          }
+        },
+        {
+          "client_id": "294320042897-vkk2d4bla1f7esl718daf79j0u4boikl.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCiYAZsTL3BjIv0bYpCC2n7CveMrZTV9xQ"
+          "current_key": "AIzaSyBUoMiLzt9txrE0-GVYFgPsvr-MGwlfa74"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "74983151136-43c6lukhqc87uatao7f1q6k7ogrq8kvj.apps.googleusercontent.com",
+              "client_id": "294320042897-vkk2d4bla1f7esl718daf79j0u4boikl.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

@@ -1,4 +1,4 @@
-package com.alphaartrem.youtube_ui;
+package com.alphaartrem.youtubeclone;
 
 import io.flutter.embedding.android.FlutterActivity;
 
