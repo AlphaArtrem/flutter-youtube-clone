@@ -1,6 +1,11 @@
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:youtube_ui/helper/functions.dart';
+import 'package:youtube_ui/helper/loading.dart';
+import 'package:youtube_ui/helper/youtubeAPI.dart';
+import 'package:youtube_ui/screens/videoPlayer.dart';
 
 class ExploreTab extends StatefulWidget {
   @override
@@ -19,63 +24,54 @@ class _ExploreTabState extends State<ExploreTab> {
     'Live': Icon(Icons.live_tv, color: Colors.white),
   };
 
-  List<Map> _videos = [
-    {
-      'url': 'https://www.youtube.com/watch?v=Jakrc3Tn_y4',
-      'thumbnail': 'assets/img/gaming.jpeg',
-      'title': 'PS6 Leaks',
-      'date': '16 hours ago',
-      'views': '100k views',
-      'creator': 'Gamer Hub',
-      'profile': 'assets/img/gaming.jpeg',
-    },
-    {
-      'url': 'https://www.youtube.com/watch?v=exgoaU3Fr5E',
-      'thumbnail': 'assets/img/live.jpeg',
-      'title': 'Android Tricks',
-      'date': '5 months ago',
-      'views': '2M views',
-      'creator': 'Screen Junkies',
-      'profile': 'assets/img/screen.jpg',
-    },
-    {
-      'url': 'https://www.youtube.com/watch?v=n_kpJj2War8',
-      'thumbnail': 'assets/img/fashion.jpeg',
-      'title': 'Get Best Deals At Amazon',
-      'date': '1 hour ago',
-      'views': '30K views',
-      'creator': 'MarketingKing',
-      'profile': 'assets/img/david.jpg',
-    },
-    {
-      'url': 'https://www.youtube.com/watch?v=I7AJwGhNU5o',
-      'thumbnail': 'assets/img/music.jpeg',
-      'title': 'Create Digital Music',
-      'date': '1 year ago',
-      'views': '1M views',
-      'creator': 'BeatWithMe',
-      'profile': 'assets/img/joe.jpg',
-    },
-    {
-      'url': 'https://www.youtube.com/watch?v=zDME7QO6_tM',
-      'thumbnail': 'assets/img/news.jpeg',
-      'title': 'Manipulating the Collective Mind',
-      'date': '9 months ago',
-      'views': '800k views',
-      'creator': 'JackTheRipper',
-      'profile': 'assets/img/sylfer.jpg',
-    },
-  ];
+  static String key = 'AIzaSyAqMLu_Grl4Q6AMxT_ieSDF_Ul6jkchk6c';
+  YoutubeAPI _api = YoutubeAPI(key);
 
+  List _videos = [];
+  List _allVideos = [];
+  Map _channelDetails = {};
   List<Widget> _categoriesWidgets = [];
   List<Widget> _videosWidgets = [];
+
+  void setup() async{
+    List regions = ['IN','GB', 'US', 'AU', 'CA'];
+    for(String region in regions){
+      _allVideos.addAll(await _api.getTrendingVideos(region: region, maxResults: 100));
+    }
+
+    Random random = Random();
+
+    List<String> ids = [];
+
+    for(int i = 0; i < 10; i++){
+      var nextVid = _allVideos[random.nextInt(_allVideos.length)];
+      if(_videos.contains(nextVid)){
+        i--;
+        continue;
+      }
+      _videos.add(nextVid);
+      ids.add(_videos[i]["snippet"]["channelId"]);
+    }
+
+    List channels = await _api.getChannelDetails(ids);
+    for(Map channel in channels){
+      _channelDetails[channel['id']] = channel;
+    }
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    setup();
+  }
 
   @override
   Widget build(BuildContext context) {
     Size _screenSize = MediaQuery.of(context).size;
     Widget row;
     List categories = _categories.keys.toList();
-    for(int i = 0; i < _categories.length; i += 2){
+    for(int i = 0; i < _categories.length && _categoriesWidgets.length < _categories.length; i += 2){
       row = Row(
         children: <Widget>[
           Expanded(
@@ -177,26 +173,40 @@ class _ExploreTabState extends State<ExploreTab> {
       _categoriesWidgets.add(SizedBox(height: 5,));
     }
 
-    for(int index = 0 ; index < _videos.length; index++){
+    for(int index = 0 ; index < _videos.length && _videos.isNotEmpty; index++){
+      String publishedAt = uploadDuration(_videos[index]["snippet"]["publishedAt"]);
+      String viewCount = formatViewCount(_videos[index]["statistics"]["viewCount"]);
+      String thumbnail  = _videos[index]["snippet"]["thumbnails"]["high"]["url"];
+
       _videosWidgets.add(Container(
         child: Column(
           children: <Widget>[
-            AspectRatio(
-              child: Image(
-                image: AssetImage(_videos[index]['thumbnail']),
-                centerSlice: Rect.largest,
+            GestureDetector(
+              onTap: () async{
+                Map videoDetails = _videos[index];
+                videoDetails["channelImage"] = _channelDetails[_videos[0]["snippet"]['channelId']]["snippet"]["thumbnails"]["default"]["url"];
+                videoDetails["subscriberCount"] = _channelDetails[_videos[0]["snippet"]['channelId']]["statistics"]["subscriberCount"];
+                await Navigator.push(context, MaterialPageRoute(
+                    builder : (context) => VideoPlayer(videoDetails)
+                ));
+              },
+              child: AspectRatio(
+                child: Image(
+                  image: NetworkImage(thumbnail),
+                  fit: BoxFit.cover,
+                ),
+                aspectRatio: 16 / 9,
               ),
-              aspectRatio: 16 / 9,
             ),
             ListTile(
               leading: CircleAvatar(
-                backgroundImage: AssetImage(_videos[index]['profile']),
+                backgroundImage: NetworkImage(_channelDetails[_videos[0]["snippet"]['channelId']]["snippet"]["thumbnails"]["default"]["url"]),
               ),
               title: Text(
-                _videos[index]['title'],
+                _videos[index]["snippet"]['title'],
                 style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15.0),
               ),
-              subtitle: Text(_videos[index]['creator']+ " \u22C5 " + _videos[index]['views'] + " \u22C5 "+ _videos[index]['date'], style: TextStyle(color: Colors.grey, fontSize: 12.0)),
+              subtitle: Text(_videos[index]["snippet"]['channelTitle'] + " \u22C5 " + viewCount + " \u22C5 "  + publishedAt, style: TextStyle(color: Colors.grey, fontSize: 12.0)),
               trailing: Icon(Icons.more_vert),
             ),
           ],
@@ -204,7 +214,7 @@ class _ExploreTabState extends State<ExploreTab> {
       ));
     }
 
-    return ListView(
+    return _videos.isEmpty ? spinkit :ListView(
       children: [
         Container(
           height: _screenSize.height * 0.33,

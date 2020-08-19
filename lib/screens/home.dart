@@ -1,7 +1,11 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:youtube_ui/helper/functions.dart';
 import 'package:youtube_ui/helper/loading.dart';
 import 'package:youtube_ui/helper/youtubeAPI.dart';
+import 'package:youtube_ui/screens/videoPlayer.dart';
 
 class HomeTab extends StatefulWidget {
   @override
@@ -9,10 +13,13 @@ class HomeTab extends StatefulWidget {
 }
 
 class _HomeTabState extends State<HomeTab> {
-  static String key = 'Your_Api_Key';
+  //static String key = 'Your-API-Key';
+  static String key = 'AIzaSyAqMLu_Grl4Q6AMxT_ieSDF_Ul6jkchk6c';
   YoutubeAPI _api = YoutubeAPI(key);
 
   List _videos = [];
+  List _allVideos = [];
+  Map _channelDetails = {};
 
   List<Map> _shortVideos = [
     {
@@ -48,8 +55,30 @@ class _HomeTabState extends State<HomeTab> {
   ];
 
   void setup() async{
-    _videos = await _api.getTrendingVideos(region: 'US', maxResults: 100);
-    print(_videos[0]["snippet"]["thumbnails"]['high']['url']);
+    List regions = ['IN','GB', 'US', 'AU', 'CA'];
+    for(String region in regions){
+      _allVideos.addAll(await _api.getTrendingVideos(region: region, maxResults: 5));
+    }
+
+    Random random = Random();
+
+    List<String> ids = [];
+
+    for(int i = 0; i < 10; i++){
+      var nextVid = _allVideos[random.nextInt(_allVideos.length)];
+      if(_videos.contains(nextVid)){
+        i--;
+        continue;
+      }
+      _videos.add(nextVid);
+      ids.add(_videos[i]["snippet"]["channelId"]);
+    }
+
+    List channels = await _api.getChannelDetails(ids);
+    for(Map channel in channels){
+      _channelDetails[channel['id']] = channel;
+    }
+
     setState(() {});
   }
 
@@ -58,77 +87,6 @@ class _HomeTabState extends State<HomeTab> {
     super.initState();
     setup();
   }
-  var a = {
-      "kind": "youtube#video",
-      "etag": "psSyD50a5d343kVOXE2xIqMdGlA",
-      "id": "oxoWhyS9buA",
-      "snippet": {
-        "publishedAt": "2020-08-18T15:00:02Z",
-        "channelId": "UC3IZKseVpdzPSBaWxBxundA",
-        "title": "BTS (방탄소년단) 'Dynamite' Official Teaser",
-        "description": "BTS (방탄소년단) 'Dynamite' Official Teaser\n\nBTS (방탄소년단) 'Dynamite' Official MV will be released at 1PM(KST), 12AM(EST) on August 21, 2020\n\n\nCredits:\nDirector: Yong Seok Choi (Lumpens)\nAssistant Director: Jihye Yoon (Lumpens)\n\nDirector of Photography: Hyunwoo Nam (GDW)\nB Camera Operator: Eumko\nFocus Puller: Sangwoo Yun, Youngwoo Lee\n2nd AC: Eunki Kim\n3rd AC: Kyuwon Seo\nDIT: Eunil Lee\n\nGaffer: Song Hyunsuk\nLighting Crew: Choi Jung Hyun, Hwang Uigyu, Kim Hyun Ju, Park Cheonil, Park Yeonghwan, Yeom Jaehyeok\n\nJimmy Jib Operator: Youngjung Kim\nJimmy Jib Assistant: Hyun in Kim, Sung Hoon Kim\n\nArt Director: Bona Kim, Jinsil Park (MU:E)\nAssistant Art Team: Yeri Kang (MU:E)\nArt-team Manager: ilho Heo (MU:E)\n\nProducer: Emma Sungeun Kim (GE Production)\nLocation Manager: Ji Hoon Han\n\nVFX STUDIO: PLASTIC BEACH\nVFX Supervisor: Ohzeon\nVFX Assistant Supervisor: Jojeem\nVFX Project Manager: Chanyoung Song, Jieun Jeong\nVFX Producer: Kyutae Jang\n3D Artist: Kwangwon Lee, Doyeon Kim, Jeonghwa Lee, Jiwon Jeon\n2D Artist: Gihoon Jang, Hyunjun Lee\n\nVisual Creative: Nu Kim, Sabinne Cheon, Lee Sun Kyoung, Kim Ga Eun, Jung Su Jung\nPerformance Directing: Son Sung Deuk, Lee Ga Hun, Lee Byung Eun, Hyewon Park\nArtist Management: Kim Shin Gyu, Kim Su Bin, Kim Dae Young, Park Jun Tae, An Da Sol, Ahn Jong Hun, Yun Tae Woong, Lee Seung Byeong, Lee Jung Min\n\nBig Hit Entertainment. Rights are reserved selectively in the video. Unauthorized reproduction is a violation of applicable laws. Manufactured by Big Hit Entertainment, Seoul, Korea.\n\nConnect with BTS: \nhttps://ibighit.com/bts \nhttp://twitter.com/BTS_bighit\nhttp://twitter.com/BTS_twt \nhttp://www.facebook.com/bangtan.official \nhttps://www.youtube.com/user/BANGTANTV \nhttp://instagram.com/BTS.bighitofficial \nhttps://channels.vlive.tv/FE619 \nhttps://www.tiktok.com/@bts_official_bighit\nhttps://weverse.onelink.me/qt3S/94808190\nhttps://www.weibo.com/BTSbighit\nhttps://www.weibo.com/BTSmembers \nhttp://i.youku.com/btsofficial \nhttp://btsblog.ibighit.com\n\n\n#BTS #방탄소년단 #BTS_Dynamite #Dynamite #Teaser",
-        "thumbnails": {
-          "default": {
-            "url": "https://i.ytimg.com/vi/oxoWhyS9buA/default.jpg",
-            "width": 120,
-            "height": 90
-          },
-          "medium": {
-            "url": "https://i.ytimg.com/vi/oxoWhyS9buA/mqdefault.jpg",
-            "width": 320,
-            "height": 180
-          },
-          "high": {
-            "url": "https://i.ytimg.com/vi/oxoWhyS9buA/hqdefault.jpg",
-            "width": 480,
-            "height": 360
-          },
-          "standard": {
-            "url": "https://i.ytimg.com/vi/oxoWhyS9buA/sddefault.jpg",
-            "width": 640,
-            "height": 480
-          },
-          "maxres": {
-            "url": "https://i.ytimg.com/vi/oxoWhyS9buA/maxresdefault.jpg",
-            "width": 1280,
-            "height": 720
-          }
-        },
-        "channelTitle": "Big Hit Labels",
-        "tags": [
-          "BIGHIT",
-          "빅히트",
-          "방탄소년단",
-          "BTS",
-          "BANGTAN",
-          "방탄"
-        ],
-        "categoryId": "10",
-        "liveBroadcastContent": "none",
-        "defaultLanguage": "ko",
-        "localized": {
-          "title": "BTS (방탄소년단) 'Dynamite' Official Teaser",
-          "description": "BTS (방탄소년단) 'Dynamite' Official Teaser\n\nBTS (방탄소년단) 'Dynamite' Official MV will be released at 1PM(KST), 12AM(EST) on August 21, 2020\n\n\nCredits:\nDirector: Yong Seok Choi (Lumpens)\nAssistant Director: Jihye Yoon (Lumpens)\n\nDirector of Photography: Hyunwoo Nam (GDW)\nB Camera Operator: Eumko\nFocus Puller: Sangwoo Yun, Youngwoo Lee\n2nd AC: Eunki Kim\n3rd AC: Kyuwon Seo\nDIT: Eunil Lee\n\nGaffer: Song Hyunsuk\nLighting Crew: Choi Jung Hyun, Hwang Uigyu, Kim Hyun Ju, Park Cheonil, Park Yeonghwan, Yeom Jaehyeok\n\nJimmy Jib Operator: Youngjung Kim\nJimmy Jib Assistant: Hyun in Kim, Sung Hoon Kim\n\nArt Director: Bona Kim, Jinsil Park (MU:E)\nAssistant Art Team: Yeri Kang (MU:E)\nArt-team Manager: ilho Heo (MU:E)\n\nProducer: Emma Sungeun Kim (GE Production)\nLocation Manager: Ji Hoon Han\n\nVFX STUDIO: PLASTIC BEACH\nVFX Supervisor: Ohzeon\nVFX Assistant Supervisor: Jojeem\nVFX Project Manager: Chanyoung Song, Jieun Jeong\nVFX Producer: Kyutae Jang\n3D Artist: Kwangwon Lee, Doyeon Kim, Jeonghwa Lee, Jiwon Jeon\n2D Artist: Gihoon Jang, Hyunjun Lee\n\nVisual Creative: Nu Kim, Sabinne Cheon, Lee Sun Kyoung, Kim Ga Eun, Jung Su Jung\nPerformance Directing: Son Sung Deuk, Lee Ga Hun, Lee Byung Eun, Hyewon Park\nArtist Management: Kim Shin Gyu, Kim Su Bin, Kim Dae Young, Park Jun Tae, An Da Sol, Ahn Jong Hun, Yun Tae Woong, Lee Seung Byeong, Lee Jung Min\n\nBig Hit Entertainment. Rights are reserved selectively in the video. Unauthorized reproduction is a violation of applicable laws. Manufactured by Big Hit Entertainment, Seoul, Korea.\n\nConnect with BTS: \nhttps://ibighit.com/bts \nhttp://twitter.com/BTS_bighit\nhttp://twitter.com/BTS_twt \nhttp://www.facebook.com/bangtan.official \nhttps://www.youtube.com/user/BANGTANTV \nhttp://instagram.com/BTS.bighitofficial \nhttps://channels.vlive.tv/FE619 \nhttps://www.tiktok.com/@bts_official_bighit\nhttps://weverse.onelink.me/qt3S/94808190\nhttps://www.weibo.com/BTSbighit\nhttps://www.weibo.com/BTSmembers \nhttp://i.youku.com/btsofficial \nhttp://btsblog.ibighit.com\n\n\n#BTS #방탄소년단 #BTS_Dynamite #Dynamite #Teaser"
-        },
-        "defaultAudioLanguage": "en"
-      },
-      "contentDetails": {
-        "duration": "PT29S",
-        "dimension": "2d",
-        "definition": "hd",
-        "caption": "false",
-        "licensedContent": true,
-        "contentRating": {},
-        "projection": "rectangular"
-      },
-      "statistics": {
-        "viewCount": "29134422",
-        "likeCount": "3675872",
-        "dislikeCount": "59858",
-        "favoriteCount": "0",
-        "commentCount": "775217"
-      }
-    };
 
 
   @override
@@ -137,57 +95,33 @@ class _HomeTabState extends State<HomeTab> {
     return _videos.isEmpty ? spinkit : ListView.builder(
       itemCount: _videos.length,
       itemBuilder: (BuildContext context, int index) {
-        String publishedAt = '';
-        Duration difference = DateTime.now().difference(DateTime.parse(_videos[index]["snippet"]["publishedAt"]));
-
-        if(difference.inDays > 0){
-          if(difference.inDays > 365){
-            publishedAt += (difference.inDays / 365).floor().toString() + ' years ago';
-          }
-          if(difference.inDays > 30 && difference.inDays < 365){
-            publishedAt += (difference.inDays / 30).floor().toString() + ' months ago';
-          }
-          if(difference.inDays >=1 && difference.inDays < 305){
-            publishedAt += difference.inDays.floor().toString() + ' days ago';
-          }
-        }
-        else if(difference.inHours > 0){
-          publishedAt += difference.inHours.toString() + ' hours ago';
-        }
-        else if(difference.inMinutes > 0){
-          publishedAt += difference.inMinutes.toString() + ' minutes ago';
-        }
-        else{
-          publishedAt += difference.inSeconds.toString() + ' seconds ago';
-        }
-
-        String viewOriginal = _videos[index]["statistics"]["viewCount"];
-        int views = int.parse(viewOriginal);
-        String viewCount = views.toString() + ' views';
-
-        if(views > 1000 && views < 1000000){
-          viewCount = (views ~/ 1000).toString() + 'k views';
-        }
-        else if(views >= 1000000){
-          viewCount = (views ~/ 1000000).toString() + 'M views';
-        }
-
-
+        String publishedAt = uploadDuration(_videos[index]["snippet"]["publishedAt"]);
+        String viewCount = formatViewCount(_videos[index]["statistics"]["viewCount"]);
         String thumbnail  = _videos[index]["snippet"]["thumbnails"]["high"]["url"];
 
         return Container(
           child: Column(
             children: <Widget>[
-              AspectRatio(
-                child: Image(
-                  image: NetworkImage(thumbnail),
-                  fit: BoxFit.cover,
+              GestureDetector(
+                onTap: () async{
+                  Map videoDetails = _videos[index];
+                  videoDetails["channelImage"] = _channelDetails[_videos[0]["snippet"]['channelId']]["snippet"]["thumbnails"]["default"]["url"];
+                  videoDetails["subscriberCount"] = _channelDetails[_videos[0]["snippet"]['channelId']]["statistics"]["subscriberCount"];
+                  await Navigator.push(context, MaterialPageRoute(
+                      builder : (context) => VideoPlayer(videoDetails)
+                  ));
+                },
+                child: AspectRatio(
+                  child: Image(
+                    image: NetworkImage(thumbnail),
+                    fit: BoxFit.cover,
+                  ),
+                  aspectRatio: 16 / 9,
                 ),
-                aspectRatio: 16 / 9,
               ),
               ListTile(
                 leading: CircleAvatar(
-                  backgroundImage: AssetImage('assets/img/david.jpg'),
+                  backgroundImage: NetworkImage(_channelDetails[_videos[0]["snippet"]['channelId']]["snippet"]["thumbnails"]["default"]["url"]),
                 ),
                 title: Text(
                   _videos[index]["snippet"]['title'],

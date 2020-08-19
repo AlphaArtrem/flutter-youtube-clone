@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:youtube_ui/wrapper.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(YoutubeUIClone());
 }
 
