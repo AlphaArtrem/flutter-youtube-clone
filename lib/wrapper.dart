@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:youtube_ui/helper/accounts.dart';
 import 'package:youtube_ui/screens/explore.dart';
 import 'package:youtube_ui/screens/home.dart';
 import 'package:youtube_ui/screens/library.dart';
@@ -15,6 +16,7 @@ class Wrapper extends StatefulWidget {
 class _WrapperState extends State<Wrapper> {
   int _selectedIndex = 0;
   static List<Widget> _widgetOptions = <Widget>[HomeTab(),ExploreTab(),SubscriptionTab(), NotificationsTab(), LibraryTab(),];
+  Account _user = Account();
 
   void _onItemTapped(int index) {
     setState(() {
@@ -51,10 +53,19 @@ class _WrapperState extends State<Wrapper> {
             onPressed: () {},
             icon: Icon(Icons.search),
           ),
-          IconButton(
-            onPressed: () {},
+          _user.currentUser() == null ?IconButton(
+            onPressed: () async{
+              await _user.signInWithGoogle();
+              setState(() {});
+            },
             icon: Icon(Icons.person),
+          ) : CircleAvatar(
+            child: ClipOval(
+              child: Image.network(_user.currentUser().photoUrl),
+            ),
+            radius: size.width * 0.055,
           ),
+          SizedBox(width: 5,),
         ],
       ),
       body: Center(

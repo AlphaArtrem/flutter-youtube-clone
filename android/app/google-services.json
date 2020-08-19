@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "74983151136",
+    "firebase_url": "https://clone-be1e6.firebaseio.com",
+    "project_id": "clone-be1e6",
+    "storage_bucket": "clone-be1e6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:74983151136:android:c6036eaafd36bf41dc8e45",
+        "android_client_info": {
+          "package_name": "com.alphaartrem.youtube_ui"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "74983151136-43c6lukhqc87uatao7f1q6k7ogrq8kvj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCiYAZsTL3BjIv0bYpCC2n7CveMrZTV9xQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "74983151136-43c6lukhqc87uatao7f1q6k7ogrq8kvj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
