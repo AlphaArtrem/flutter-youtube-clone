@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class YoutubeAPI{
-  final String key = "YOUR_KEY_HERE";
+  final String key = "AIzaSyBlNqafmStY7X1MVDDBYm95UgYdpv_bS70";
 
   Future<List> getTrendingVideos({String region = 'us', int maxResults = 10}) async{
     Map<String, dynamic> options = {
