@@ -35,8 +35,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
   Map _channelDetails = {};
   String _id;
 
-  static String key = 'AIzaSyAqMLu_Grl4Q6AMxT_ieSDF_Ul6jkchk6c';
-  YoutubeAPI _api = YoutubeAPI(key);
+  YoutubeAPI _api = YoutubeAPI();
 
   void setup() async{
     _sharedPreferences =  await SharedPreferences.getInstance();
@@ -112,8 +111,9 @@ class _VideoPlayerState extends State<VideoPlayer> {
             GestureDetector(
               onTap: () async{
                 Map videoDetails = _videos[index];
-                videoDetails["channelImage"] = _channelDetails[_videos[0]["snippet"]['channelId']]["snippet"]["thumbnails"]["default"]["url"];
-                videoDetails["subscriberCount"] = _channelDetails[_videos[0]["snippet"]['channelId']]["statistics"]["subscriberCount"];
+                videoDetails["id"] = _videos[index]["id"]["videoId"];
+                videoDetails["channelImage"] = _channelDetails[_videos[index]["snippet"]['channelId']]["snippet"]["thumbnails"]["default"]["url"];
+                videoDetails["subscriberCount"] = _channelDetails[_videos[index]["snippet"]['channelId']]["statistics"]["subscriberCount"];
                 _controller.pause();
                 await Navigator.push(context, MaterialPageRoute(
                     builder : (context) => VideoPlayer(videoDetails)
@@ -130,7 +130,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
             ),
             ListTile(
               leading: CircleAvatar(
-                backgroundImage: NetworkImage(_channelDetails[_videos[0]["snippet"]['channelId']]["snippet"]["thumbnails"]["default"]["url"]),
+                backgroundImage: NetworkImage(_channelDetails[_videos[index]["snippet"]['channelId']]["snippet"]["thumbnails"]["default"]["url"]),
               ),
               title: Text(
                 _videos[index]["snippet"]['title'],

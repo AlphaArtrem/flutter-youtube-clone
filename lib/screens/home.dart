@@ -13,9 +13,7 @@ class HomeTab extends StatefulWidget {
 }
 
 class _HomeTabState extends State<HomeTab> {
-  //static String key = 'Your-API-Key';
-  static String key = 'AIzaSyAqMLu_Grl4Q6AMxT_ieSDF_Ul6jkchk6c';
-  YoutubeAPI _api = YoutubeAPI(key);
+  YoutubeAPI _api = YoutubeAPI();
 
   List _videos = [];
   List _allVideos = [];
@@ -57,21 +55,21 @@ class _HomeTabState extends State<HomeTab> {
   void setup() async{
     List regions = ['IN','GB', 'US', 'AU', 'CA'];
     for(String region in regions){
-      _allVideos.addAll(await _api.getTrendingVideos(region: region, maxResults: 5));
+      _allVideos.addAll(await _api.getTrendingVideos(region: region, maxResults: 50));
     }
 
     Random random = Random();
 
     List<String> ids = [];
 
-    for(int i = 0; i < 10; i++){
+    for(int i = 0; i < 25; i++){
       var nextVid = _allVideos[random.nextInt(_allVideos.length)];
       if(_videos.contains(nextVid)){
         i--;
-        continue;
+      }else{
+        _videos.add(nextVid);
+        ids.add(_videos[i]["snippet"]["channelId"]);
       }
-      _videos.add(nextVid);
-      ids.add(_videos[i]["snippet"]["channelId"]);
     }
 
     List channels = await _api.getChannelDetails(ids);
@@ -105,8 +103,8 @@ class _HomeTabState extends State<HomeTab> {
               GestureDetector(
                 onTap: () async{
                   Map videoDetails = _videos[index];
-                  videoDetails["channelImage"] = _channelDetails[_videos[0]["snippet"]['channelId']]["snippet"]["thumbnails"]["default"]["url"];
-                  videoDetails["subscriberCount"] = _channelDetails[_videos[0]["snippet"]['channelId']]["statistics"]["subscriberCount"];
+                  videoDetails["channelImage"] = _channelDetails[_videos[index]["snippet"]['channelId']]["snippet"]["thumbnails"]["default"]["url"];
+                  videoDetails["subscriberCount"] = _channelDetails[_videos[index]["snippet"]['channelId']]["statistics"]["subscriberCount"];
                   await Navigator.push(context, MaterialPageRoute(
                       builder : (context) => VideoPlayer(videoDetails)
                   ));
@@ -121,7 +119,7 @@ class _HomeTabState extends State<HomeTab> {
               ),
               ListTile(
                 leading: CircleAvatar(
-                  backgroundImage: NetworkImage(_channelDetails[_videos[0]["snippet"]['channelId']]["snippet"]["thumbnails"]["default"]["url"]),
+                  backgroundImage: NetworkImage(_channelDetails[_videos[index]["snippet"]['channelId']]["snippet"]["thumbnails"]["default"]["url"]),
                 ),
                 title: Text(
                   _videos[index]["snippet"]['title'],

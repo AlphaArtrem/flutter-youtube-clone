@@ -1,40 +1,62 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:youtubeclone/helper/functions.dart';
 import 'package:youtubeclone/helper/loading.dart';
 import 'package:youtubeclone/helper/youtubeAPI.dart';
 import 'package:youtubeclone/screens/videoPlayer.dart';
 
-class SearchPage extends StatefulWidget {
-  final String search;
-  SearchPage(this.search);
+
+class PrefVideos extends StatefulWidget {
+  final String prefKey;
+  final String title;
+  PrefVideos(this.prefKey, this.title);
   @override
-  _SearchPageState createState() => _SearchPageState();
+  _PrefVideosState createState() => _PrefVideosState();
 }
 
-class _SearchPageState extends State<SearchPage> {
+class _PrefVideosState extends State<PrefVideos> {
   TextEditingController _controller = TextEditingController();
   List _videos = [];
   Map _channelDetails = {};
+  SharedPreferences _sharedPreferences;
+  bool _loading = true;
 
   YoutubeAPI _api = YoutubeAPI();
 
   void setup() async{
-
-    _videos = await _api.searchVideos(widget.search);
-
+    _sharedPreferences = await SharedPreferences.getInstance();
     List<String> ids = [];
+    if(_sharedPreferences.containsKey(widget.prefKey)){
+      List _history = _sharedPreferences.getStringList(widget.prefKey);
+      if(_history.length > 10){
+        _videos = await _api.getVideos(_history.sublist(_history.length - 11, _history.length -1).reversed.toList());
+      }
+      else{
+        _videos = await _api.getVideos(_history.reversed.toList());
+      }
 
-    for(int i = 0; i < _videos.length; i++){
-      ids.add(_videos[i]["snippet"]["channelId"]);
+      if(_videos == null){
+        _videos = [];
+      }
+
+      for(int i = 0; i < _videos.length ; i++){
+        ids.add(_videos[i]["snippet"]["channelId"]);
+      }
+
+      List channels = await _api.getChannelDetails(ids);
+
+      if(channels == null){
+        channels = [];
+      }
+
+      for(Map channel in channels) {
+        _channelDetails[channel['id']] = channel;
+      }
     }
 
-    List channels = await _api.getChannelDetails(ids);
-
-    for(Map channel in channels) {
-      _channelDetails[channel['id']] = channel;
-    }
-
-    setState(() {});
+    setState(() {
+      _loading = false;
+    });
   }
 
   @override
@@ -48,32 +70,16 @@ class _SearchPageState extends State<SearchPage> {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false,
         elevation: 1.0,
-        title: TextField(
-          controller: _controller,
-          textInputAction: TextInputAction.search,
-          decoration: InputDecoration(
-              border: OutlineInputBorder(
-                  borderSide: BorderSide.none
-              ),
-              prefixIcon: Icon(Icons.search, color: Colors.grey[400],),
-              hintText: widget.search,
-          ),
-          onSubmitted: (value) async{
-            await Navigator.push(context, MaterialPageRoute(
-                builder: (context) => SearchPage(value)
-            ));
-          },
-        ),
+        title: Text(widget.title),
       ),
-      body: _videos.isEmpty ? spinkit : Padding(
+      body: _loading ? spinkit : _videos.isEmpty ? Center(child: Text("No ${widget.title} found"),) : Padding(
         padding: const EdgeInsets.only(top: 15, left: 15),
         child: ListView.builder(
           itemCount: _videos.length,
           itemBuilder: (context, index){
             String publishedAt = uploadDuration(_videos[index]["snippet"]["publishedAt"]);
-            String thumbnail  = _videos[index]["snippet"]["thumbnails"]["medium"]["url"];
+            String thumbnail  = _videos[index]["snippet"]["thumbnails"]["standard"]["url"];
             return Container(
               padding: EdgeInsets.only(right: 15, bottom: 10),
               child: Row(
@@ -83,7 +89,6 @@ class _SearchPageState extends State<SearchPage> {
                     child: GestureDetector(
                       onTap: () async{
                         Map videoDetails = _videos[index];
-                        videoDetails["id"] = _videos[index]["id"]["videoId"];
                         videoDetails["channelImage"] = _channelDetails[_videos[index]["snippet"]['channelId']]["snippet"]["thumbnails"]["default"]["url"];
                         videoDetails["subscriberCount"] = _channelDetails[_videos[index]["snippet"]['channelId']]["statistics"]["subscriberCount"];
                         await Navigator.push(context, MaterialPageRoute(

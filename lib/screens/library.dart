@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:youtubeclone/helper/loading.dart';
 import 'package:youtubeclone/helper/youtubeAPI.dart';
+import 'package:youtubeclone/screens/prefVideos.dart';
 import 'package:youtubeclone/screens/videoPlayer.dart';
 
 class LibraryTab extends StatefulWidget {
@@ -12,11 +13,12 @@ class LibraryTab extends StatefulWidget {
 class _LibraryTabState extends State<LibraryTab> {
   List _recent = [];
   SharedPreferences _sharedPreferences;
-  static String key = 'AIzaSyAqMLu_Grl4Q6AMxT_ieSDF_Ul6jkchk6c';
   bool _loading = true;
   Map _channelDetails = {};
+  int _watchLater = 0;
+  int _likedVideos = 0;
 
-  YoutubeAPI _api = YoutubeAPI(key);
+  YoutubeAPI _api = YoutubeAPI();
 
   void setup() async{
     _sharedPreferences = await SharedPreferences.getInstance();
@@ -24,10 +26,10 @@ class _LibraryTabState extends State<LibraryTab> {
     if(_sharedPreferences.containsKey("history")){
       List _history = _sharedPreferences.getStringList("history");
       if(_history.length > 10){
-        _recent = await _api.getVideos(_history.sublist(_history.length - 11, _history.length -1));
+        _recent = await _api.getVideos(_history.sublist(_history.length - 11, _history.length -1).reversed.toList());
       }
       else{
-        _recent = await _api.getVideos(_history);
+        _recent = await _api.getVideos(_history.reversed.toList());
       }
 
       for(int i = 0; i < _recent.length; i++){
@@ -40,6 +42,15 @@ class _LibraryTabState extends State<LibraryTab> {
         _channelDetails[channel['id']] = channel;
       }
     }
+
+    if(_sharedPreferences.containsKey("watchLater")){
+      _watchLater = _sharedPreferences.getStringList("watchLater").length;
+    }
+
+    if(_sharedPreferences.containsKey("likedVideos")){
+      _likedVideos = _sharedPreferences.getStringList("likedVideos").length;
+    }
+
     setState(() {
       _loading = false;
     });
@@ -110,12 +121,19 @@ class _LibraryTabState extends State<LibraryTab> {
           ),
           Padding(
             padding: const EdgeInsets.only(left: 25.0, top: 25.0, bottom: 8.0),
-            child: Row(
-              children: [
-                Icon(Icons.history),
-                SizedBox(width: 25.0,),
-                Text('History', style: TextStyle(fontSize: 15.0),),
-              ],
+            child: GestureDetector(
+              onTap: (){
+                Navigator.push(context, MaterialPageRoute(
+                  builder: (context) => PrefVideos("history", 'History')
+                ));
+              },
+              child: Row(
+                children: [
+                  Icon(Icons.history),
+                  SizedBox(width: 25.0,),
+                  Text('History', style: TextStyle(fontSize: 15.0),),
+                ],
+              ),
             ),
           ),
           Padding(
@@ -136,12 +154,19 @@ class _LibraryTabState extends State<LibraryTab> {
           ),
           Padding(
             padding: const EdgeInsets.only(left: 25.0, bottom: 8.0),
-            child: Row(
-              children: [
-                Icon(Icons.play_circle_outline),
-                SizedBox(width: 25.0,),
-                Text('Your videos', style: TextStyle(fontSize: 15.0),),
-              ],
+            child: GestureDetector(
+              onTap: (){
+                Navigator.push(context, MaterialPageRoute(
+                    builder: (context) => PrefVideos("likedVideos", 'Liked Videos')
+                ));
+              },
+              child: Row(
+                children: [
+                  Icon(Icons.play_circle_outline),
+                  SizedBox(width: 25.0,),
+                  Text('Your videos', style: TextStyle(fontSize: 15.0),),
+                ],
+              ),
             ),
           ),
           Padding(
@@ -156,18 +181,25 @@ class _LibraryTabState extends State<LibraryTab> {
           ),
           Padding(
             padding: const EdgeInsets.only(left: 25.0, bottom: 20.0),
-            child: Row(
-              children: [
-                Icon(Icons.access_time),
-                SizedBox(width: 25.0,),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Watch Later', style: TextStyle(fontSize: 15.0),),
-                    Text('5 unwatched videos', style: TextStyle(fontSize: 12.0, color: Colors.grey[400]),),
-                  ],
-                ),
-              ],
+            child: GestureDetector(
+              onTap: (){
+                Navigator.push(context, MaterialPageRoute(
+                    builder: (context) => PrefVideos("watchLater", 'Watch Later')
+                ));
+              },
+              child: Row(
+                children: [
+                  Icon(Icons.access_time),
+                  SizedBox(width: 25.0,),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Watch Later', style: TextStyle(fontSize: 15.0),),
+                      Text('$_watchLater unwatched videos', style: TextStyle(fontSize: 12.0, color: Colors.grey[400]),),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
           Container(
@@ -191,18 +223,25 @@ class _LibraryTabState extends State<LibraryTab> {
           ),
           Padding(
             padding: const EdgeInsets.only(left: 25.0, bottom: 20.0),
-            child: Row(
-              children: [
-                Icon(Icons.thumb_up),
-                SizedBox(width: 25.0,),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Liked videos', style: TextStyle(fontSize: 15.0),),
-                    Text('107 videos', style: TextStyle(fontSize: 12.0, color: Colors.grey[400]),),
-                  ],
-                ),
-              ],
+            child: GestureDetector(
+              onTap: (){
+                Navigator.push(context, MaterialPageRoute(
+                    builder: (context) => PrefVideos("likedVideos", 'Liked Videos')
+                ));
+              },
+              child: Row(
+                children: [
+                  Icon(Icons.thumb_up),
+                  SizedBox(width: 25.0,),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Liked videos', style: TextStyle(fontSize: 15.0),),
+                      Text('$_likedVideos videos', style: TextStyle(fontSize: 12.0, color: Colors.grey[400]),),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ],
